@@ -9,6 +9,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
+        buildConfigField("String", "BASE_URL", "https://fakestoreapi.com/")
         applicationId = "com.example.productexplorer"
         minSdk = 24
         targetSdk = 34
