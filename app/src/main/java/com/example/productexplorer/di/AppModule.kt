@@ -2,7 +2,14 @@ package com.example.productexplorer.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.productexplorer.data.db.ProductDao
 import com.example.productexplorer.data.db.ProductDatabase
+import com.example.productexplorer.data.local.IProductLocalDataSource
+import com.example.productexplorer.data.local.ProductLocalDataSource
+import com.example.productexplorer.data.remote.IProductRemoteDataSource
+import com.example.productexplorer.data.remote.ProductRemoteDataSource
+import com.example.productexplorer.repo.IProductRepository
+import com.example.productexplorer.repo.ProductRepository
 import com.example.productexplorer.service.api.IProductService
 import dagger.Module
 import dagger.Provides
@@ -20,11 +27,11 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-    private const val BASE_URL = "https://fakestoreapi.com/"
+    private const val BASE_URL = "https://fakestoreapi.com/";
 
     @Provides
     @Singleton
-    private fun createLoggingInterceptor(): Interceptor{
+    fun createLoggingInterceptor(): Interceptor{
         return HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
@@ -32,7 +39,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    private fun createOkHttpClient(loggingInterceptor: HttpLoggingInterceptor): OkHttpClient{
+    fun createOkHttpClient(loggingInterceptor: Interceptor): OkHttpClient{
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
             .readTimeout(60, TimeUnit.SECONDS)
@@ -43,7 +50,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    private fun createRetrofitClient(okHttpClient: OkHttpClient): Retrofit{
+    fun createRetrofitClient(okHttpClient: OkHttpClient): Retrofit{
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(okHttpClient)
@@ -53,7 +60,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    private fun createProductService(retrofit: Retrofit): IProductService{
+    fun createProductService(retrofit: Retrofit): IProductService{
         return retrofit.create(IProductService::class.java)
     }
 
@@ -69,5 +76,24 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideProductDao(database: ProductDatabase) = database.productDao()
+    fun createProductDao(database: ProductDatabase) = database.productDao()
+
+    @Provides
+    @Singleton
+    fun createProductRemoteDataSource(productService: IProductService): IProductRemoteDataSource{
+        return ProductRemoteDataSource(productService)
+    }
+
+    @Provides
+    @Singleton
+    fun createProductLocalDataSource(dao: ProductDao): IProductLocalDataSource{
+        return ProductLocalDataSource(dao)
+    }
+
+    @Provides
+    @Singleton
+    fun createProductRepository(local: IProductLocalDataSource, remote: IProductRemoteDataSource): IProductRepository{
+        return ProductRepository(local, remote)
+    }
+
 }

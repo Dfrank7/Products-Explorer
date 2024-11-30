@@ -1,15 +1,21 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    kotlin("kapt") // Apply the kapt plugin
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt) // Hilt plugin
+//    kotlin("kapt") // Apply the kapt plugin
 }
 
 android {
+    hilt {
+        enableAggregatingTask = false
+    }
+
     namespace = "com.example.productexplorer"
     compileSdk = 34
 
     defaultConfig {
-        buildConfigField("String", "BASE_URL", "https://fakestoreapi.com/")
+        buildConfigField("String", "BASE_URL", "\"https://fakestoreapi.com/\"")
         applicationId = "com.example.productexplorer"
         minSdk = 24
         targetSdk = 34
@@ -18,6 +24,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+
 
     buildTypes {
         release {
@@ -35,6 +42,11 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    buildFeatures {
+        viewBinding = true
+    }
+
+    android.buildFeatures.buildConfig = true
 }
 
 dependencies {
@@ -45,16 +57,18 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.dagger.hilt)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
     implementation(libs.room)
     implementation(libs.room.ktx)
-    kapt(libs.room.compiler)
+    ksp(libs.room.compiler)
     implementation(libs.retrofit)
     implementation(libs.gson.converter)
     implementation(libs.okhttp)
     implementation(libs.viewmodel)
     implementation(libs.coroutines)
     implementation(libs.livedata)
+    implementation(libs.navigation.ui)
+    implementation(libs.navigation.fragment)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
