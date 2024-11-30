@@ -1,9 +1,13 @@
 package com.example.productexplorer.di
 
+import android.content.Context
+import androidx.room.Room
+import com.example.productexplorer.data.db.ProductDatabase
 import com.example.productexplorer.service.api.IProductService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -52,4 +56,18 @@ object AppModule {
     private fun createProductService(retrofit: Retrofit): IProductService{
         return retrofit.create(IProductService::class.java)
     }
+
+    @Provides
+    @Singleton
+    fun createProductDatabase(@ApplicationContext context: Context): ProductDatabase {
+        return Room.databaseBuilder(
+            context,
+            ProductDatabase::class.java,
+            "product_database"
+        ).fallbackToDestructiveMigration().build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideProductDao(database: ProductDatabase) = database.productDao()
 }
