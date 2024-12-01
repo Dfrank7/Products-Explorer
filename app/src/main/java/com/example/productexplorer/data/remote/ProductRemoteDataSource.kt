@@ -12,4 +12,8 @@ class ProductRemoteDataSource @Inject constructor(
         return iProductService.getAllProducts()
     }
 
+    override suspend fun getRemoteProductById(id: Int): Product {
+        return iProductService.getProductById(id)
+    }
+
 }

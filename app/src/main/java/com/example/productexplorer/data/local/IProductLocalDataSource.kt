@@ -7,7 +7,9 @@ interface IProductLocalDataSource {
 
     suspend fun saveProducts(product: List<Product>)
 
-    fun getAllProducts(): Flow<List<Product>>
+    fun getAllSavedProducts(): Flow<List<Product>>
+
+    fun getProductById(id: Int): Flow<Product>
 
     suspend fun clearProducts()
 }

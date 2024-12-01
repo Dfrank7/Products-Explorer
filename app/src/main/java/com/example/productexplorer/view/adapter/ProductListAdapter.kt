@@ -1,12 +1,14 @@
 package com.example.productexplorer.view.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.productexplorer.databinding.ProductItemBinding
 import com.example.productexplorer.model.Product
+import com.example.productexplorer.utility.loadPicture
 
 class ProductListAdapter(private val clickListener: ProductListener): ListAdapter<Product, RecyclerView.ViewHolder>(
     ResultDiffCallback()
@@ -46,8 +48,13 @@ class ProductListAdapter(private val clickListener: ProductListener): ListAdapte
 
     class ViewHolder private constructor(private val binding: ProductItemBinding): RecyclerView.ViewHolder(binding.root){
         fun bind(result: Product, clickListener: ProductListener){
-            binding.view.setOnClickListener {
-                clickListener.onClick(result)
+            binding.apply {
+                loadPicture(root.context, result.image, productIv)
+                titleTv.text = result.title
+                priceTv.text = result.price.toString()
+                view.setOnClickListener {
+                    clickListener.onClick(result)
+                }
             }
         }
 

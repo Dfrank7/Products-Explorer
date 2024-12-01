@@ -10,8 +10,22 @@
         android:name="com.example.productexplorer.view.ui.ProductListFragment"
         tools:layout="@layout/product_list_fragment">
 
+        <action
+            android:id="@+id/action_showDetail"
+            app:destination="@id/productDetailFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"/>
+
     </fragment>
 
-
+    <fragment
+        android:id="@+id/productDetailFragment"
+        android:name="com.example.productexplorer.view.ui.ProductDetailFragment"
+        android:label="Product Details"
+        tools:layout="@layout/product_detail_fragment">
+        <argument
+            android:name="productId"
+            app:argType="integer"/>
+    </fragment>
 
 </navigation>

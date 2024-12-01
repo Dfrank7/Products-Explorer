@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.safeargs)
     alias(libs.plugins.hilt) // Hilt plugin
 //    kotlin("kapt") // Apply the kapt plugin
 }
@@ -49,6 +50,7 @@ android {
     android.buildFeatures.buildConfig = true
 }
 
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -69,6 +71,8 @@ dependencies {
     implementation(libs.livedata)
     implementation(libs.navigation.ui)
     implementation(libs.navigation.fragment)
+    implementation(libs.glide)
+    ksp(libs.glide.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

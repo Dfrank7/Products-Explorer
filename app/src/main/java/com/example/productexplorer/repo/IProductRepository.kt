@@ -8,7 +8,13 @@ interface IProductRepository {
 
     fun getAllProducts(): Flow<NetworkResult<List<Product>>>
 
+    fun getProduct(int: Int): Flow<NetworkResult<Product>>
+
     suspend fun getRemoteProducts(): List<Product>
+
+    suspend fun getRemoteProductById(id: Int): Product
+
+    suspend fun getSavedProductById(id: Int): Flow<Product>
 
     suspend fun saveProducts(products: List<Product>)
 

@@ -12,8 +12,12 @@ class ProductLocalDataSource @Inject constructor(
         dao.insertProducts(product)
     }
 
-    override fun getAllProducts(): Flow<List<Product>> {
-        return dao.getAllProducts()
+    override fun getAllSavedProducts(): Flow<List<Product>> {
+        return dao.getAllSavedProducts()
+    }
+
+    override fun getProductById(id: Int): Flow<Product> {
+        return dao.getProductById(id)
     }
 
     override suspend fun clearProducts() {

@@ -35,4 +35,12 @@ class ProductViewModel @Inject constructor(
         }
     }
 
+    fun fetchProductById(id: Int) {
+        viewModelScope.launch {
+            repository.getProduct(id).collect { result ->
+                _productDetailFlow.value = result
+            }
+        }
+    }
+
 }

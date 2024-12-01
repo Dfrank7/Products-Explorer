@@ -25,7 +25,7 @@ class ProductRepository @Inject constructor(
         }catch (e: HttpException){
             emit(NetworkResult.Error(message = "HTTP Error: ${e.code()}"))
         }catch (e: IOException){
-            val localProducts = productLocalDataSource.getAllProducts().first()
+            val localProducts = getSavedProducts().first()
             if (localProducts.isNotEmpty()) {
                 emit(NetworkResult.Success(localProducts, isFromCache = true))
             } else {
@@ -34,16 +34,38 @@ class ProductRepository @Inject constructor(
         }
     }
 
-    override suspend fun getRemoteProducts(): List<Product> {
+    override fun getProduct(id: Int): Flow<NetworkResult<Product>> = flow {
+        emit(NetworkResult.Loading())
+        try {
+            val product = getRemoteProductById(id)
+            emit(NetworkResult.Success(product))
+        } catch (e: Exception) {
+            val localProduct = getSavedProductById(id).first()
+            if (localProduct != null) {
+                emit(NetworkResult.Success(localProduct, isFromCache = true))
+            } else {
+                emit(NetworkResult.Error(message = "Error fetching product: ${e.message}"))
+            }
+        }
+    }
 
+    override suspend fun getRemoteProducts(): List<Product> {
         return productRemoteDataSource.getAllRemoteProducts()
     }
 
+    override suspend fun getRemoteProductById(id: Int): Product {
+        return productRemoteDataSource.getRemoteProductById(id)
+    }
+
+    override suspend fun getSavedProductById(id: Int): Flow<Product> {
+        return productLocalDataSource.getProductById(id)
+    }
+
     override suspend fun saveProducts(products: List<Product>) {
-        productLocalDataSource.saveProducts(products)
+        return productLocalDataSource.saveProducts(products)
     }
 
     override fun getSavedProducts(): Flow<List<Product>> {
-        TODO("Not yet implemented")
+        return productLocalDataSource.getAllSavedProducts()
     }
 }

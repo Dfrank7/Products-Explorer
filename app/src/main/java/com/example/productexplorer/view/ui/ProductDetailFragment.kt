@@ -1,7 +1,6 @@
 package com.example.productexplorer.view.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,70 +10,70 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.productexplorer.databinding.ProductListFragmentBinding
+import androidx.navigation.fragment.navArgs
+import com.example.productexplorer.databinding.ProductDetailFragmentBinding
 import com.example.productexplorer.service.NetworkResult
-import com.example.productexplorer.view.adapter.ProductListAdapter
+import com.example.productexplorer.utility.loadPicture
 import com.example.productexplorer.viewmodel.ProductViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class ProductListFragment: Fragment() {
-    private lateinit var binding: ProductListFragmentBinding
-    private lateinit var productAdapter: ProductListAdapter
+class ProductDetailFragment: Fragment() {
+    private lateinit var binding: ProductDetailFragmentBinding
+
     private val viewModel: ProductViewModel by viewModels()
+    private var productId: Int = -1
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = ProductListFragmentBinding.inflate(inflater, container, false)
+        binding = ProductDetailFragmentBinding.inflate(layoutInflater, container, false)
+        productId = ProductDetailFragmentArgs.fromBundle(requireArguments()).productId
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupRecyclerView()
-        observeProducts()
+
+        viewModel.fetchProductById(productId)
+
+        observeProductDetails()
     }
 
-
-    private fun setupRecyclerView() {
-        productAdapter = ProductListAdapter(ProductListAdapter.ProductListener{
-            this@ProductListFragment.findNavController().navigate(ProductListFragmentDirections.actionShowDetail(it.id))
-        })
-        binding.run {
-            binding.recyclerView.apply {
-                layoutManager = LinearLayoutManager(requireContext())
-                adapter = productAdapter
-            }
-        }
-    }
-
-
-    private fun observeProducts() {
+    private fun observeProductDetails() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.productsFlow.collect { result ->
+                viewModel.productDetailFlow.collect { result ->
                     when (result) {
                         is NetworkResult.Loading -> {
                             binding.progressBar.visibility = View.VISIBLE
+                            binding.contentContainer.visibility = View.GONE
                         }
                         is NetworkResult.Success -> {
                             binding.progressBar.visibility = View.GONE
-                            productAdapter.submitList(result.data)
-                            binding.recyclerView.requestLayout()
+                            binding.contentContainer.visibility = View.VISIBLE
 
+                            result.data?.let { product ->
+                                binding.apply {
+                                    titleTv.text = product.title
+                                    descriptionTv.text = product.description
+                                    priceTv.text = "$${product.price}"
+                                    categoryTv.text = product.category
+                                    loadPicture(requireActivity(), product.image, productIv)
+//                                    textViewRating.text = "Rating: ${product.rating.rate} (${product.rating.count} reviews)"
+                                }
 
-                            if (result.isFromCache) {
-                                Toast.makeText(
-                                    context,
-                                    "Showing cached products",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                if (result.isFromCache) {
+                                    Toast.makeText(
+                                        context,
+                                        "Showing cached product details",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             }
                         }
                         is NetworkResult.Error -> {

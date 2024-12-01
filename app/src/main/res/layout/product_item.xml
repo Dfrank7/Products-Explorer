@@ -15,35 +15,36 @@
         android:padding="16dp">
 
         <ImageView
-            android:id="@+id/productImage"
+            android:id="@+id/productIv"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:scaleType="centerCrop"
+            android:contentDescription="Product Image"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/productTitle"
+            android:id="@+id/titleTv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:textStyle="bold"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/productImage"
+            app:layout_constraintStart_toEndOf="@id/productIv"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Product Name"/>
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/productPrice"
+            android:id="@+id/priceTv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:textColor="@android:color/holo_green_dark"
             android:textSize="14sp"
-            app:layout_constraintStart_toEndOf="@id/productImage"
-            app:layout_constraintTop_toBottomOf="@id/productTitle"
+            app:layout_constraintStart_toEndOf="@id/productIv"
+            app:layout_constraintTop_toBottomOf="@id/titleTv"
             tools:text="$99.99"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
