@@ -17,6 +17,7 @@ import com.example.productexplorer.databinding.ProductListFragmentBinding
 import com.example.productexplorer.service.NetworkResult
 import com.example.productexplorer.view.adapter.ProductListAdapter
 import com.example.productexplorer.viewmodel.ProductViewModel
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -39,6 +40,7 @@ class ProductListFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         observeProducts()
+        observeInternet()
     }
 
 
@@ -69,13 +71,13 @@ class ProductListFragment: Fragment() {
                             binding.recyclerView.requestLayout()
 
 
-                            if (result.isFromCache) {
-                                Toast.makeText(
-                                    context,
-                                    "Showing cached products",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
+//                            if (result.isFromCache) {
+//                                Toast.makeText(
+//                                    context,
+//                                    "Showing cached products",
+//                                    Toast.LENGTH_SHORT
+//                                ).show()
+//                            }
                         }
                         is NetworkResult.Error -> {
                             binding.progressBar.visibility = View.GONE
@@ -90,5 +92,24 @@ class ProductListFragment: Fragment() {
             }
         }
     }
+
+    private fun observeInternet(){
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.checkInternet.collect { connected ->
+                    when (connected) {
+                        false -> {
+                            Toast.makeText(requireContext(), "No Internet Connection", Toast.LENGTH_LONG).show()
+                        }
+
+                        true -> {
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
 }

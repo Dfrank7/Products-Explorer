@@ -8,6 +8,8 @@ interface IProductRepository {
 
     fun getAllProducts(): Flow<NetworkResult<List<Product>>>
 
+    fun getAllSavedProducts(): Flow<NetworkResult<List<Product>>>
+
     fun getProduct(int: Int): Flow<NetworkResult<Product>>
 
     suspend fun getRemoteProducts(): List<Product>

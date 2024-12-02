@@ -51,7 +51,7 @@ class ProductListAdapter(private val clickListener: ProductListener): ListAdapte
             binding.apply {
                 loadPicture(root.context, result.image, productIv)
                 titleTv.text = result.title
-                priceTv.text = result.price.toString()
+                priceTv.text = "$${result.price}"
                 view.setOnClickListener {
                     clickListener.onClick(result)
                 }

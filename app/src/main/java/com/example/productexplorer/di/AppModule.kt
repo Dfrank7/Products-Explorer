@@ -2,6 +2,7 @@ package com.example.productexplorer.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.productexplorer.ProductApplication
 import com.example.productexplorer.data.db.ProductDao
 import com.example.productexplorer.data.db.ProductDatabase
 import com.example.productexplorer.data.local.IProductLocalDataSource
@@ -11,9 +12,12 @@ import com.example.productexplorer.data.remote.ProductRemoteDataSource
 import com.example.productexplorer.repo.IProductRepository
 import com.example.productexplorer.repo.ProductRepository
 import com.example.productexplorer.service.api.IProductService
+import com.example.productexplorer.utility.network.INetworkStatus
+import com.example.productexplorer.utility.network.NetworkStatus
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.HiltAndroidApp
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
@@ -92,8 +96,15 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun createProductRepository(local: IProductLocalDataSource, remote: IProductRemoteDataSource): IProductRepository{
-        return ProductRepository(local, remote)
+    fun createProductRepository(local: IProductLocalDataSource, remote: IProductRemoteDataSource, networkStatus: INetworkStatus): IProductRepository{
+        return ProductRepository(local, remote, networkStatus)
+    }
+
+    @Provides
+    @Singleton
+    fun createNetworkStatus(@ApplicationContext context: Context): INetworkStatus{
+        val app = context as ProductApplication
+        return NetworkStatus(app)
     }
 
 }

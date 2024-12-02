@@ -18,6 +18,7 @@ okhttp = "4.12.0"
 navigation = "2.7.5"
 ksp = "1.9.0-1.0.12"
 glide = "4.11.0"
+mockito = "4.5.1"
 
 
 [libraries]
@@ -44,6 +45,11 @@ navigation_fragment = {group = "androidx.navigation", name = "navigation-fragmen
 navigation_ui = {group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigation"}
 glide = {group = "com.github.bumptech.glide", name = "glide", version.ref = "glide"}
 glide-compiler = {group = "com.github.bumptech.glide", name = "compiler", version.ref = "glide"}
+mockito-core = {group = "org.mockito", name = "mockito-core", version.ref = "mockito"}
+mockito-inline = {group = "org.mockito", name = "mockito-inline", version.ref = "mockito"}
+coroutines-test = {group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version = "1.7.3"}
+core-testing = {group = "androidx.arch.core", name = "core-testing", version = "2.2.0"}
+
 
 
 
