@@ -49,7 +49,7 @@ class ProductViewModel @Inject constructor(
 
     private fun checkInternet(){
         viewModelScope.launch {
-            //update
+            //using update is memory efficient than value
             _checkInternet.update {networkStatus.isConnected()}
         }
     }

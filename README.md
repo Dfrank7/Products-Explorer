@@ -35,3 +35,10 @@ Product Explorer is an Android application that fetches and displays products fr
 
 ## Testing
 - Unit tests for ViewModel and Repository
+
+## Trade Offs
+- Current implementation uses simple error handling
+- Implement pagination for product list in case of larger list
+- Writing of UI and Instrumentation tests.
+- wrote more codes, so as to make system robust so that new features or updates can be added easily.
+- Probably add a swiperefreshlistener.
