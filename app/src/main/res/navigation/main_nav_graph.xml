@@ -8,6 +8,7 @@
     <fragment
         android:id="@+id/mainFragment"
         android:name="com.example.productexplorer.view.ui.ProductListFragment"
+        android:label="Product List"
         tools:layout="@layout/product_list_fragment">
 
         <action

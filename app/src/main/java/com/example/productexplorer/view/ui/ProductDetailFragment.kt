@@ -23,7 +23,6 @@ class ProductDetailFragment: Fragment() {
     private lateinit var binding: ProductDetailFragmentBinding
 
     private val viewModel: ProductViewModel by viewModels()
-    private var productId: Int = -1
 
 
     override fun onCreateView(
@@ -32,13 +31,12 @@ class ProductDetailFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = ProductDetailFragmentBinding.inflate(layoutInflater, container, false)
-        productId = ProductDetailFragmentArgs.fromBundle(requireArguments()).productId
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        val productId = ProductDetailFragmentArgs.fromBundle(requireArguments()).productId
         viewModel.fetchProductById(productId)
 
         observeProductDetails()

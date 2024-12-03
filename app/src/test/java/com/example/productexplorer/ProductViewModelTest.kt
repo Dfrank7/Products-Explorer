@@ -5,6 +5,7 @@ import com.example.productexplorer.model.Product
 import com.example.productexplorer.model.Rating
 import com.example.productexplorer.repo.ProductRepository
 import com.example.productexplorer.service.NetworkResult
+import com.example.productexplorer.utility.network.INetworkStatus
 import com.example.productexplorer.viewmodel.ProductViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -31,6 +32,9 @@ class ProductViewModelTest {
 
     @Mock
     private lateinit var mockRepository: ProductRepository
+
+    @Mock
+    private lateinit var networkStatus: INetworkStatus
 
     private lateinit var viewModel: ProductViewModel
 
@@ -62,12 +66,12 @@ class ProductViewModelTest {
     @Test
     fun `fetchProducts updates productsFlow with success result`() = runTest {
         // Arrange
-        `when`(mockRepository.getAllProducts()).thenReturn(
+        `when`(mockRepository.getAllSavedProducts()).thenReturn(
             flowOf(NetworkResult.Success(testProducts))
         )
 
         // Act
-        viewModel = ProductViewModel(mockRepository)
+        viewModel = ProductViewModel(mockRepository, networkStatus)
         testDispatcher.scheduler.advanceUntilIdle()
 
         // Assert
@@ -85,10 +89,14 @@ class ProductViewModelTest {
             flowOf(NetworkResult.Success(product))
         )
 
+        `when`(mockRepository.getAllSavedProducts()).thenReturn(
+            flowOf(NetworkResult.Success(emptyList())) // Mock an empty list
+        )
+
         // Act
-        viewModel = ProductViewModel(mockRepository)
+        viewModel = ProductViewModel(mockRepository, networkStatus)
         viewModel.fetchProductById(productId)
-      //  testDispatcher.scheduler.advanceUntilIdle()
+        testDispatcher.scheduler.advanceUntilIdle()
 
         // Assert
         val result = viewModel.productDetailFlow.value
@@ -99,12 +107,12 @@ class ProductViewModelTest {
     @Test
     fun `fetchProducts updates productsFlow with error result`() = runTest {
         // Arrange
-        `when`(mockRepository.getAllProducts()).thenReturn(
+        `when`(mockRepository.getAllSavedProducts()).thenReturn(
             flowOf(NetworkResult.Error("Test Error"))
         )
 
         // Act
-        viewModel = ProductViewModel(mockRepository)
+        viewModel = ProductViewModel(mockRepository, networkStatus)
         testDispatcher.scheduler.advanceUntilIdle()
 
         // Assert

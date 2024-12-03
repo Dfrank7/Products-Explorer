@@ -38,6 +38,7 @@ class ProductListFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel.fetchProducts()
         setupRecyclerView()
         observeProducts()
         observeInternet()
@@ -48,11 +49,11 @@ class ProductListFragment: Fragment() {
         productAdapter = ProductListAdapter(ProductListAdapter.ProductListener{
             this@ProductListFragment.findNavController().navigate(ProductListFragmentDirections.actionShowDetail(it.id))
         })
-        binding.run {
-            binding.recyclerView.apply {
-                layoutManager = LinearLayoutManager(requireContext())
-                adapter = productAdapter
-            }
+
+        binding.recyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = productAdapter
+
         }
     }
 
@@ -67,17 +68,14 @@ class ProductListFragment: Fragment() {
                         }
                         is NetworkResult.Success -> {
                             binding.progressBar.visibility = View.GONE
-                            productAdapter.submitList(result.data)
-                            binding.recyclerView.requestLayout()
-
-
-//                            if (result.isFromCache) {
-//                                Toast.makeText(
-//                                    context,
-//                                    "Showing cached products",
-//                                    Toast.LENGTH_SHORT
-//                                ).show()
-//                            }
+                            if (!result.data.isNullOrEmpty()) {
+                                productAdapter.submitList(result.data)
+                                binding.recyclerView.requestLayout()
+                            }else{
+                                binding.recyclerView.visibility = View.GONE
+                                binding.tvNoData.visibility = View.VISIBLE
+                                binding.tvNoData.text = "No Available Products"
+                            }
                         }
                         is NetworkResult.Error -> {
                             binding.progressBar.visibility = View.GONE

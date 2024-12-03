@@ -1,5 +1,6 @@
 package com.example.productexplorer.repo
 
+import android.util.Log
 import com.example.productexplorer.data.local.IProductLocalDataSource
 import com.example.productexplorer.data.remote.IProductRemoteDataSource
 import com.example.productexplorer.model.Product
@@ -19,39 +20,39 @@ class ProductRepository @Inject constructor(
     private val networkStatus: INetworkStatus
 ): IProductRepository {
     override fun getAllProducts(): Flow<NetworkResult<List<Product>>> = flow{
-       // emit(NetworkResult.Loading())
         try {
             if (networkStatus.isConnected()) {
                 val products = getRemoteProducts()
-                productLocalDataSource.clearProducts()
-                saveProducts(products)
+                productLocalDataSource.apply {
+                    clearProducts()
+                    saveProducts(products)
+                }
+                emit(NetworkResult.Success(products))
             }
-         //   val localProducts = getSavedProducts().first()
-//            if (localProducts.isNotEmpty()) {
-//                emit(NetworkResult.Success(localProducts, isFromCache = true))
-//            } else {
-//                emit(NetworkResult.Error(message = "Network Error: No response"))
-//            }
-          //  emit(NetworkResult.Success(products))
         }catch (e: HttpException){
             emit(NetworkResult.Error(message = "HTTP Error: ${e.code()}"))
         }catch (e: IOException){
-//            val localProducts = getSavedProducts().first()
-//            if (localProducts.isNotEmpty()) {
-//                emit(NetworkResult.Success(localProducts, isFromCache = true))
-//            } else {
-//                emit(NetworkResult.Error(message = "Network Error: ${e.message}"))
-//            }
+            e.stackTrace
+            val localProducts = getSavedProducts().first()
+            if (localProducts.isNotEmpty()) {
+                emit(NetworkResult.Success(localProducts, isFromCache = true))
+            } else {
+                emit(NetworkResult.Error(message = "Error: No Products Available"))
+            }
         }
     }
 
     override fun getAllSavedProducts(): Flow<NetworkResult<List<Product>>> = flow {
         emit(NetworkResult.Loading())
-        val localProducts = getSavedProducts().first()
-        if (localProducts.isNotEmpty()) {
-            emit(NetworkResult.Success(localProducts, isFromCache = true))
-        } else {
-            emit(NetworkResult.Error(message = "Network Error: No response"))
+        try {
+            val localProducts = getSavedProducts().first()
+            if (localProducts.isNotEmpty()) {
+                emit(NetworkResult.Success(localProducts, isFromCache = true))
+            } else {
+                emit(NetworkResult.Error(message = "Error: No Products Available"))
+            }
+        }catch (e: Exception){
+            emit(NetworkResult.Error(message = "Network Error: ${e.message}"))
         }
     }
 
@@ -61,6 +62,7 @@ class ProductRepository @Inject constructor(
             val product = getRemoteProductById(id)
             emit(NetworkResult.Success(product))
         } catch (e: Exception) {
+            e.stackTrace
             val localProduct = getSavedProductById(id).first()
             if (localProduct != null) {
                 emit(NetworkResult.Success(localProduct, isFromCache = true))
@@ -80,10 +82,6 @@ class ProductRepository @Inject constructor(
 
     override suspend fun getSavedProductById(id: Int): Flow<Product> {
         return productLocalDataSource.getProductById(id)
-    }
-
-    override suspend fun saveProducts(products: List<Product>) {
-        return productLocalDataSource.saveProducts(products)
     }
 
     override fun getSavedProducts(): Flow<List<Product>> {

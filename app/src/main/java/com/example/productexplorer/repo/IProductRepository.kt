@@ -18,8 +18,6 @@ interface IProductRepository {
 
     suspend fun getSavedProductById(id: Int): Flow<Product>
 
-    suspend fun saveProducts(products: List<Product>)
-
     fun getSavedProducts(): Flow<List<Product>>
 
 }

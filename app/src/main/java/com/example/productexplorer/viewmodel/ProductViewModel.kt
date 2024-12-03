@@ -1,5 +1,6 @@
 package com.example.productexplorer.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.productexplorer.model.Product
@@ -11,12 +12,16 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ProductViewModel @Inject constructor(
-    private val repository: IProductRepository
+    private val repository: IProductRepository,
+    private val networkStatus: INetworkStatus
 ): ViewModel() {
 
     private val _productsFlow = MutableStateFlow<NetworkResult<List<Product>>>(NetworkResult.Loading())
@@ -28,33 +33,31 @@ class ProductViewModel @Inject constructor(
     private val _checkInternet = MutableStateFlow(false)
     val checkInternet : StateFlow<Boolean> = _checkInternet
 
-    @Inject lateinit var networkStatus: INetworkStatus
-
     init {
         fetchSavedProducts()
-        fetchProducts()
+       // fetchProducts()
         checkInternet()
     }
 
-    private fun fetchProducts() {
+    fun fetchProducts() {
         viewModelScope.launch {
-            repository.getAllProducts()
-//                .collect { result ->
-//                _productsFlow.value = result
-//            }
+            if (networkStatus.isConnected()) {
+                repository.getAllProducts().first()
+            }
         }
     }
 
     private fun checkInternet(){
         viewModelScope.launch {
-            _checkInternet.value = networkStatus.isConnected()
+            //update
+            _checkInternet.update {networkStatus.isConnected()}
         }
     }
 
     private fun fetchSavedProducts(){
         viewModelScope.launch {
             repository.getAllSavedProducts().collect { result ->
-                _productsFlow.value = result
+                _productsFlow.update {result}
             }
         }
     }
@@ -62,7 +65,7 @@ class ProductViewModel @Inject constructor(
     fun fetchProductById(id: Int) {
         viewModelScope.launch {
             repository.getProduct(id).collect { result ->
-                _productDetailFlow.value = result
+                _productDetailFlow.update { result }
             }
         }
     }
